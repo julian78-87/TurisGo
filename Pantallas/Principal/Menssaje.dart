@@ -1,5 +1,5 @@
 import 'package:evv/Componentes/General/Datos.dart';
-import 'package:evv/Pantallas/Principal.dart';
+import 'package:evv/Componentes/General/Principal.dart';
 import 'package:flutter/material.dart';
 
 class MessagesPage extends StatefulWidget {

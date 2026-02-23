@@ -1,4 +1,4 @@
-import 'package:evv/Pantallas/Principal.dart';
+import 'package:evv/Componentes/General/Principal.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

@@ -1,10 +1,10 @@
-import 'package:evv/Pantallas/AddService.dart';
+import 'package:evv/Pantallas/Sub/AddService.dart';
 import 'package:evv/Componentes/General/Datos.dart';
-import 'package:evv/Pantallas/Home.dart';
-import 'package:evv/Pantallas/Menssaje.dart';
-import 'package:evv/Pantallas/MyReserv.dart';
-import 'package:evv/Pantallas/Profil.dart';
-import 'package:evv/Pantallas/Search_Filter.dart';
+import 'package:evv/Pantallas/Principal/Home.dart';
+import 'package:evv/Pantallas/Principal/Menssaje.dart';
+import 'package:evv/Pantallas/Principal/MyReserv.dart';
+import 'package:evv/Pantallas/Principal/Profil.dart';
+import 'package:evv/Pantallas/Principal/Search_Filter.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {

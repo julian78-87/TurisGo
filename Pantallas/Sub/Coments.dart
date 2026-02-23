@@ -1,8 +1,10 @@
+import 'package:evv/Componentes/General/Datos.dart';
 import 'package:evv/Main.dart';
 import 'package:flutter/material.dart';
 
 class RatingPage extends StatefulWidget {
-  const RatingPage({super.key});
+  final String serviceId;
+  const RatingPage({super.key, required this.serviceId});
 
   @override
   State<RatingPage> createState() => _RatingPageState();
@@ -24,7 +26,8 @@ class _RatingPageState extends State<RatingPage> {
 
     try {
       await supabase.from('ratings').insert({
-        'user_name': 'Usuario',
+        'service_id': widget.serviceId,
+        'user_name': AppData.currentUser['nombre'],
         'rating': selectedStars,
         'comment': commentController.text.trim(),
       });
@@ -54,7 +57,10 @@ class _RatingPageState extends State<RatingPage> {
           Expanded(
             flex: 2,
             child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: supabase.from('ratings').stream(primaryKey: ['id']),
+              stream: supabase
+                  .from('ratings')
+                  .stream(primaryKey: ['id'])
+                  .eq('service_id', widget.serviceId),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -164,7 +170,7 @@ class _RatingPageState extends State<RatingPage> {
                       stream: supabase
                           .from('ratings')
                           .stream(primaryKey: ['id'])
-                          .order('created_at', ascending: false),
+                          .eq('service_id', widget.serviceId),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return const Center(

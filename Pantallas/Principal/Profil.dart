@@ -1,7 +1,7 @@
 import 'package:evv/Componentes/General/Datos.dart';
-import 'package:evv/Pantallas/Login_Register.dart';
-import 'package:evv/Pantallas/Notification.dart';
-import 'package:evv/Pantallas/Stats_Panel.dart';
+import 'package:evv/Pantallas/Principal/Login_Register.dart';
+import 'package:evv/Pantallas/Sub/Notification.dart';
+import 'package:evv/Pantallas/Sub/Stats_Panel.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {

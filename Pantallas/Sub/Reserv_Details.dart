@@ -1,5 +1,6 @@
 import 'package:evv/Componentes/General/Datos.dart';
-import 'package:evv/Pantallas/Principal.dart';
+import 'package:evv/Componentes/General/Principal.dart';
+import 'package:evv/Pantallas/Sub/Coments.dart';
 import 'package:flutter/material.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
@@ -11,7 +12,6 @@ class ServiceDetailScreen extends StatefulWidget {
 }
 
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
-  int _rating = 5;
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
 
   void _book() {
@@ -94,20 +94,67 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   ),
                   const SizedBox(height: 30),
                   const Text(
-                    'Califica este servicio',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Opiniones de usuarios',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      5,
-                      (i) => IconButton(
-                        icon: Icon(
-                          Icons.star,
-                          color: i < _rating ? Colors.amber : Colors.grey,
-                          size: 40,
+                  const SizedBox(height: 10),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RatingPage(serviceId: widget.service.id),
                         ),
-                        onPressed: () => setState(() => _rating = i + 1),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                          ),
+                        ],
+                        border: Border.all(color: Colors.teal.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 28),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${widget.service.rating} Estrellas',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                'Ver las ${widget.service.reviews} opiniones',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.teal,
+                          ),
+                        ],
                       ),
                     ),
                   ),

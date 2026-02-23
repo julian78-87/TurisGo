@@ -1,4 +1,4 @@
-import 'package:evv/Pantallas/Login_Register.dart';
+import 'package:evv/Pantallas/Principal/Login_Register.dart';
 import 'package:flutter/material.dart';
 
 class ExploraTurismoApp extends StatelessWidget {

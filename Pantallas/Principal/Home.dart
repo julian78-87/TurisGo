@@ -1,6 +1,6 @@
 import 'package:evv/Componentes/General/Datos.dart';
-import 'package:evv/Pantallas/Principal.dart';
-import 'package:evv/Pantallas/Reserv_Details.dart';
+import 'package:evv/Componentes/General/Principal.dart';
+import 'package:evv/Pantallas/Sub/Reserv_Details.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
