@@ -1,2 +1,2 @@
 # TurisGo
-Carpeta del Proyecto, divido en Fontend/Backend/Base de datos
+Carpeta del Proyecto, divido en Componentes/ Pantallas
