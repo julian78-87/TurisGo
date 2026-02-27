@@ -17,6 +17,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
+  final colorCoral = const Color(0xFFFF6B6B);
+
   final List<Widget> _pages = [
     const HomePage(),
     const SearchPage(),
@@ -32,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        indicatorColor: colorCoral.withOpacity(0.5),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Inicio'),
           NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
@@ -51,8 +54,8 @@ class _MainScreenState extends State<MainScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => const AddServiceScreen()),
               ),
+              backgroundColor: colorCoral.withOpacity(0.7),
               child: const Icon(Icons.add),
-              backgroundColor: Colors.teal,
             )
           : null,
     );

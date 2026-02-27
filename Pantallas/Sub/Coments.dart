@@ -14,11 +14,19 @@ class _RatingPageState extends State<RatingPage> {
   int selectedStars = 0;
   final TextEditingController commentController = TextEditingController();
 
+  // --- PALETA CORAL REEF ---
+  final colorFondo = const Color(0xFFF8FAFC);
+  final colorCoral = const Color(0xFFFF6B6B);
+  final colorCerceta = const Color(0xFF0D9488);
+  final colorTexto = const Color(0xFF1E293B);
+
   Future<void> _submit() async {
     if (selectedStars == 0 || commentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Debes seleccionar estrellas y escribir un comentario"),
+        SnackBar(
+          content: const Text("Selecciona estrellas y escribe algo"),
+          backgroundColor: colorCoral,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -33,12 +41,13 @@ class _RatingPageState extends State<RatingPage> {
       });
 
       commentController.clear();
-      setState(() {
-        selectedStars = 0;
-      });
+      setState(() => selectedStars = 0);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Comentario enviado correctamente")),
+        SnackBar(
+          content: const Text("¡Gracias por tu opinión!"),
+          backgroundColor: colorCerceta,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(
@@ -50,57 +59,77 @@ class _RatingPageState extends State<RatingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFECE6F0),
-      body: Row(
-        children: [
-          /// PANEL IZQUIERDO - PROMEDIO EN TIEMPO REAL
-          Expanded(
-            flex: 2,
+      backgroundColor: colorFondo,
+      appBar: AppBar(
+        title: const Text(
+          "OPINIONES",
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+        ),
+        backgroundColor: colorFondo,
+        foregroundColor: colorTexto,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: CustomScrollView(
+        slivers: [
+          // CABECERA - PROMEDIO
+          SliverToBoxAdapter(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: supabase
                   .from('ratings')
                   .stream(primaryKey: ['id'])
                   .eq('service_id', widget.serviceId),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
+                if (!snapshot.hasData) return const LinearProgressIndicator();
                 final ratings = snapshot.data!;
-                double avg = 0;
+                double avg = ratings.isEmpty
+                    ? 0
+                    : ratings
+                              .map((r) => r['rating'] as int)
+                              .reduce((a, b) => a + b) /
+                          ratings.length;
 
-                if (ratings.isNotEmpty) {
-                  avg =
-                      ratings
-                          .map((r) => r['rating'] as int)
-                          .reduce((a, b) => a + b) /
-                      ratings.length;
-                }
-
-                return Center(
+                return Container(
+                  margin: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(30),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorTexto.withOpacity(0.05),
+                        blurRadius: 20,
+                      ),
+                    ],
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         avg.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
+                        style: TextStyle(
+                          fontSize: 50,
+                          fontWeight: FontWeight.w900,
+                          color: colorTexto,
                         ),
                       ),
-                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
                           5,
                           (i) => Icon(
-                            i < avg.round() ? Icons.star : Icons.star_border,
+                            i < avg.round()
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
                             color: Colors.amber,
+                            size: 30,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text("Basado en ${ratings.length} opiniones"),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Basado en ${ratings.length} experiencias",
+                        style: TextStyle(color: colorTexto.withOpacity(0.5)),
+                      ),
                     ],
                   ),
                 );
@@ -108,118 +137,154 @@ class _RatingPageState extends State<RatingPage> {
             ),
           ),
 
-          /// PANEL DERECHO
-          Expanded(
-            flex: 5,
+          // SECCIÓN PARA CALIFICAR
+          SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(40),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Deja una Calificación",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    "Tu calificación",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
-
-                  const SizedBox(height: 16),
-
+                  const SizedBox(height: 10),
                   Row(
                     children: List.generate(
                       5,
                       (i) => IconButton(
                         icon: Icon(
-                          i < selectedStars ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
+                          i < selectedStars
+                              ? Icons.star_rounded
+                              : Icons.star_outline_rounded,
+                          color: colorCoral,
+                          size: 35,
                         ),
-                        onPressed: () {
-                          setState(() {
-                            selectedStars = i + 1;
-                          });
-                        },
+                        onPressed: () => setState(() => selectedStars = i + 1),
                       ),
                     ),
                   ),
-
+                  const SizedBox(height: 15),
                   TextField(
                     controller: commentController,
                     maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: "Escribe tu comentario...",
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: "Cuéntanos tu experiencia...",
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
-
-                  const SizedBox(height: 16),
-
+                  const SizedBox(height: 15),
                   ElevatedButton(
                     onPressed: _submit,
-                    child: const Text("Enviar"),
-                  ),
-
-                  const Divider(height: 40),
-
-                  const Text(
-                    "Comentarios",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Expanded(
-                    child: StreamBuilder<List<Map<String, dynamic>>>(
-                      stream: supabase
-                          .from('ratings')
-                          .stream(primaryKey: ['id'])
-                          .eq('service_id', widget.serviceId),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        final ratings = snapshot.data!;
-
-                        return ListView.builder(
-                          itemCount: ratings.length,
-                          itemBuilder: (context, index) {
-                            final r = ratings[index];
-
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: ListTile(
-                                leading: const CircleAvatar(
-                                  child: Icon(Icons.person),
-                                ),
-                                title: Row(
-                                  children: [
-                                    Text(r['user_name'] ?? ''),
-                                    const SizedBox(width: 8),
-                                    Row(
-                                      children: List.generate(
-                                        5,
-                                        (j) => Icon(
-                                          j < r['rating']
-                                              ? Icons.star
-                                              : Icons.star_border,
-                                          size: 16,
-                                          color: Colors.amber,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                subtitle: Text(r['comment'] ?? ''),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorCerceta,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: const Text(
+                      "PUBLICAR COMENTARIO",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
+                  const SizedBox(height: 40),
+                  const Text(
+                    "Comunidad",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 15),
                 ],
               ),
             ),
+          ),
+
+          // LISTA DE COMENTARIOS
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: supabase
+                .from('ratings')
+                .stream(primaryKey: ['id'])
+                .eq('service_id', widget.serviceId),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData)
+                return const SliverToBoxAdapter(child: SizedBox());
+              final ratings = snapshot.data!;
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final r = ratings[index];
+                  return Container(
+                    margin: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      bottom: 15,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colorTexto.withOpacity(0.05)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: colorCoral.withOpacity(0.1),
+                              child: Text(
+                                r['user_name'][0].toUpperCase(),
+                                style: TextStyle(
+                                  color: colorCoral,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  r['user_name'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Row(
+                                  children: List.generate(
+                                    5,
+                                    (j) => Icon(
+                                      j < r['rating']
+                                          ? Icons.star_rounded
+                                          : Icons.star_outline_rounded,
+                                      size: 14,
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          r['comment'],
+                          style: TextStyle(
+                            color: colorTexto.withOpacity(0.8),
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }, childCount: ratings.length),
+              );
+            },
           ),
         ],
       ),
