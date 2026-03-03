@@ -14,6 +14,12 @@ class ServiceDetailScreen extends StatefulWidget {
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
 
+  // --- PALETA CORAL REEF ---
+  final colorFondo = const Color(0xFFF8FAFC); // Perla
+  final colorCoral = const Color(0xFFFF6B6B); // Coral Vibrante
+  final colorCerceta = const Color(0xFF0D9488); // Cerceta Profundo
+  final colorTexto = const Color(0xFF1E293B); // Azul Abismo
+
   void _book() {
     final res = Reservation(
       id: 'R${DateTime.now().millisecondsSinceEpoch}',
@@ -27,9 +33,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     AppData.myReservations.add(res);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('¡Reserva confirmada!'),
-        backgroundColor: Colors.teal,
+      SnackBar(
+        content: const Text(
+          '¡Aventura reservada!',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: colorCerceta,
+        behavior: SnackBarBehavior.floating,
       ),
     );
     Navigator.pop(context);
@@ -38,138 +48,198 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: colorFondo,
       body: CustomScrollView(
         slivers: [
+          // APP BAR CON IMAGEN PROTAGONISTA
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: 320,
             pinned: true,
+            iconTheme: const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                widget.service.imagen,
-                fit: BoxFit.cover,
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(widget.service.imagen, fit: BoxFit.cover),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.center,
+                        colors: [Colors.black54, Colors.transparent],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.service.nombre,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  // TÍTULO Y PRECIO
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.location_on, color: Colors.teal),
-                      Text(
-                        widget.service.ubicacion,
-                        style: const TextStyle(fontSize: 18),
+                      Expanded(
+                        child: Text(
+                          widget.service.nombre,
+                          style: TextStyle(
+                            color: colorTexto,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
                       Text(
-                        '${widget.service.rating}',
-                        style: const TextStyle(
+                        '\$${widget.service.precio.toInt()}',
+                        style: TextStyle(
+                          color: colorCerceta,
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Icon(Icons.star, color: Colors.amber),
-                      Text(' (${widget.service.reviews} opiniones)'),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    widget.service.descripcion,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 30),
-                  const Text(
-                    'Opiniones de usuarios',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
                   const SizedBox(height: 10),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RatingPage(serviceId: widget.service.id),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 20,
+
+                  // UBICACIÓN ESTILIZADA
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_rounded,
+                        color: colorCoral,
+                        size: 18,
                       ),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.service.ubicacion,
+                        style: TextStyle(
+                          color: colorTexto.withOpacity(0.6),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // CARD DE RATING "CORAL REEF"
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            RatingPage(serviceId: widget.service.id),
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 5,
+                            color: colorTexto.withOpacity(0.05),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
                         ],
-                        border: Border.all(color: Colors.teal.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 28),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${widget.service.rating} Estrellas',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorCoral.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.star_rounded,
+                                  color: Colors.orange,
+                                  size: 20,
                                 ),
-                              ),
-                              Text(
-                                'Ver las ${widget.service.reviews} opiniones',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${widget.service.rating}',
+                                  style: TextStyle(
+                                    color: colorTexto,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            '${widget.service.reviews} opiniones de viajeros',
+                            style: TextStyle(
+                              color: colorTexto.withOpacity(0.7),
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           const Spacer(),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: Colors.teal,
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            color: colorTexto.withOpacity(0.3),
                           ),
                         ],
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 30),
+                  Text(
+                    'Descripción',
+                    style: TextStyle(
+                      color: colorTexto,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.service.descripcion,
+                    style: TextStyle(
+                      color: colorTexto.withOpacity(0.7),
+                      fontSize: 15,
+                      height: 1.6,
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // BOTÓN DE ACCIÓN CORAL
                   ElevatedButton(
                     onPressed: _book,
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 56),
-                      backgroundColor: Colors.teal,
+                      backgroundColor: colorCoral,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 60),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
-                    child: Text(
-                      'Reservar ahora - \$ ${widget.service.precio.toInt()} por noche',
-                      style: const TextStyle(fontSize: 18),
+                    child: const Text(
+                      'CONFIRMAR RESERVA',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
