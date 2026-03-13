@@ -1,10 +1,12 @@
+import 'package:flutter/foundation.dart'; // Para kIsWeb
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:io'; // Aún lo usamos para plataformas móviles
 
 class ImagePickerSection extends StatelessWidget {
-  final File? image;
-  final Function(File?) onImagePicked;
+  // Cambiamos File por XFile para compatibilidad web
+  final XFile? image;
+  final Function(XFile?) onImagePicked;
 
   const ImagePickerSection({
     super.key,
@@ -17,7 +19,7 @@ class ImagePickerSection extends StatelessWidget {
       source: ImageSource.gallery,
       imageQuality: 85,
     );
-    if (picked != null) onImagePicked(File(picked.path));
+    if (picked != null) onImagePicked(picked);
   }
 
   @override
@@ -26,6 +28,7 @@ class ImagePickerSection extends StatelessWidget {
       onTap: _pickImage,
       child: Container(
         height: 200,
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(12),
@@ -33,7 +36,15 @@ class ImagePickerSection extends StatelessWidget {
         child: image != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(image!, fit: BoxFit.cover),
+                child: kIsWeb
+                    ? Image.network(
+                        image!.path,
+                        fit: BoxFit.cover,
+                      ) // Solución para Web
+                    : Image.file(
+                        File(image!.path),
+                        fit: BoxFit.cover,
+                      ), // Solución para Móvil
               )
             : const Icon(Icons.add_a_photo, size: 60, color: Colors.grey),
       ),

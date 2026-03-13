@@ -10,9 +10,11 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  final colorFondo = const Color(0xFF0F172A);
-  final colorTarjeta = const Color(0xFF1E293B);
-  final colorAcento = const Color(0xFF10B981);
+  // PALETA TURISGO
+  final Color colorFondo = const Color(0xFF1A1A1A);
+  final Color colorTarjeta = const Color(0xFF2D2D2D);
+  final Color colorAcento = Colors.orangeAccent;
+  final Color colorMarca = const Color(0xFF5F1E06);
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +22,12 @@ class _MessagesPageState extends State<MessagesPage> {
       backgroundColor: colorFondo,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: colorFondo,
+        backgroundColor: Colors.transparent,
         title: const Text(
           'MENSAJES',
           style: TextStyle(
             fontWeight: FontWeight.w900,
-            letterSpacing: 2,
+            letterSpacing: 3,
             color: Colors.white,
           ),
         ),
@@ -41,15 +43,16 @@ class _MessagesPageState extends State<MessagesPage> {
             'GlampCol',
           ];
           return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
-              color: colorTarjeta.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(20),
+              color: colorTarjeta,
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
             ),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
-                vertical: 5,
+                vertical: 8,
               ),
               leading: Container(
                 padding: const EdgeInsets.all(2),
@@ -59,6 +62,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 ),
                 child: CircleAvatar(
                   radius: 25,
+                  backgroundColor: colorMarca,
                   backgroundImage: NetworkImage(
                     'https://picsum.photos/id/${50 + i}/80',
                   ),
@@ -69,15 +73,19 @@ class _MessagesPageState extends State<MessagesPage> {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              subtitle: Text(
-                AppData.messages.isNotEmpty && i == 0
-                    ? AppData.messages.last.text
-                    : 'Hola, ¿todo listo para tu viaje?',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white54, fontSize: 13),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  AppData.messages.isNotEmpty && i == 0
+                      ? AppData.messages.last.text
+                      : 'Hola, ¿todo listo para tu viaje?',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white54, fontSize: 13),
+                ),
               ),
               trailing: const Text(
                 '14:32',
@@ -109,9 +117,11 @@ class _ChatScreenState extends State<ChatScreen> {
   final _controller = TextEditingController();
   final List<Message> _chat = List.from(AppData.messages);
 
-  final colorFondo = const Color(0xFF0F172A);
-  final colorAcento = const Color(0xFF10B981);
-  final colorBurbujaOtro = const Color(0xFF1E293B);
+  // PALETA TURISGO PARA EL CHAT
+  final Color colorFondo = const Color(0xFF1A1A1A);
+  final Color colorAcento = Colors.orangeAccent;
+  final Color colorBurbujaOtro = const Color(0xFF2D2D2D);
+  final Color colorMarca = const Color(0xFF5F1E06);
 
   void _send() {
     if (_controller.text.trim().isEmpty) return;
@@ -119,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _chat.add(
         Message(
           id: DateTime.now().toString(),
-          fromUser: 'Cristian Andrés',
+          fromUser: 'Yo',
           text: _controller.text,
           time: DateTime.now(),
           isMe: true,
@@ -136,14 +146,33 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: colorFondo,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        titleSpacing: 0,
         title: Row(
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundImage: NetworkImage('https://picsum.photos/id/60/80'),
+              backgroundColor: colorMarca,
+              backgroundImage: const NetworkImage(
+                'https://picsum.photos/id/60/80',
+              ),
             ),
             const SizedBox(width: 12),
-            Text(widget.contactName, style: const TextStyle(fontSize: 16)),
+            Text(
+              widget.contactName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
       ),
@@ -165,30 +194,28 @@ class _ChatScreenState extends State<ChatScreen> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: 18,
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: m.isMe ? colorAcento : colorBurbujaOtro,
+                      // Mi burbuja usa el color de marca, la otra el gris oscuro
+                      color: m.isMe ? colorMarca : colorBurbujaOtro,
                       borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(20),
-                        topRight: const Radius.circular(20),
-                        bottomLeft: Radius.circular(m.isMe ? 20 : 0),
-                        bottomRight: Radius.circular(m.isMe ? 0 : 20),
+                        topLeft: const Radius.circular(22),
+                        topRight: const Radius.circular(22),
+                        bottomLeft: Radius.circular(m.isMe ? 22 : 0),
+                        bottomRight: Radius.circular(m.isMe ? 0 : 22),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      border: m.isMe
+                          ? Border.all(color: colorAcento.withOpacity(0.3))
+                          : Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Text(
                       m.text,
-                      style: TextStyle(
-                        color: m.isMe ? colorFondo : Colors.white,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 15,
+                        height: 1.3,
                       ),
                     ),
                   ),
@@ -197,18 +224,14 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
 
-          // INPUT DE MENSAJE ESTILIZADO
+          // INPUT DE MENSAJE TURISGO
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 30),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 35),
             decoration: BoxDecoration(
               color: colorFondo,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
+              border: Border(
+                top: BorderSide(color: Colors.white.withOpacity(0.05)),
+              ),
             ),
             child: Row(
               children: [
@@ -216,32 +239,46 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: colorBurbujaOtro,
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     child: TextField(
                       controller: _controller,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        hintText: 'Escribe algo...',
-                        hintStyle: TextStyle(color: Colors.white24),
+                        hintText: 'Escribe a la agencia...',
+                        hintStyle: TextStyle(
+                          color: Colors.white24,
+                          fontSize: 14,
+                        ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
+                          horizontal: 22,
+                          vertical: 12,
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 GestureDetector(
                   onTap: _send,
-                  child: CircleAvatar(
-                    backgroundColor: colorAcento,
-                    child: Icon(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorAcento,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorAcento.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
                       Icons.send_rounded,
-                      color: colorFondo,
-                      size: 20,
+                      color: Color(0xFF5F1E06),
+                      size: 22,
                     ),
                   ),
                 ),

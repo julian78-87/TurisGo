@@ -1,16 +1,19 @@
+import 'package:evv/Pantallas/Principal/initial.dart';
+import 'package:evv/Pantallas/Sub/AdminPanel.dart';
+import 'package:evv/Pantallas/Sub/MyComents.dart';
+import 'package:evv/Pantallas/Sub/MyService.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:evv/Pantallas/Principal/Login_Register.dart';
 import 'package:evv/Pantallas/Sub/Notification.dart';
 import 'package:evv/Pantallas/Sub/Stats_Panel.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  // Colores del tema Ocean Night
-  final colorFondo = const Color(0xFF0F172A);
-  final colorTarjeta = const Color(0xFF1E293B);
-  final colorAcento = const Color(0xFF10B981);
+  final Color colorFondo = const Color(0xFF1A1A1A);
+  final Color colorTarjeta = const Color(0xFF2D2D2D);
+  final Color colorAcento = Colors.orangeAccent;
+  final Color colorMarca = const Color(0xFF5F1E06);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class ProfilePage extends StatelessWidget {
           'PERFIL',
           style: TextStyle(
             fontWeight: FontWeight.w900,
-            letterSpacing: 2,
+            letterSpacing: 3,
             fontSize: 18,
             color: Colors.white,
           ),
@@ -41,7 +44,11 @@ class ProfilePage extends StatelessWidget {
             .handleError((error) => print("ERROR: $error")),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: colorAcento));
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(colorAcento),
+              ),
+            );
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -62,7 +69,6 @@ class ProfilePage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             child: Column(
               children: [
-                // SECCIÓN DE ENCABEZADO (AVATAR)
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
@@ -71,7 +77,7 @@ class ProfilePage extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [colorAcento, Colors.blueAccent],
+                          colors: [colorMarca, colorAcento],
                         ),
                       ),
                       child: CircleAvatar(
@@ -90,7 +96,7 @@ class ProfilePage extends StatelessWidget {
                       backgroundColor: colorAcento,
                       child: const Icon(
                         Icons.edit,
-                        color: Colors.white,
+                        color: Color(0xFF5F1E06),
                         size: 18,
                       ),
                     ),
@@ -111,16 +117,15 @@ class ProfilePage extends StatelessWidget {
                   style: const TextStyle(color: Colors.white38, fontSize: 14),
                 ),
                 const SizedBox(height: 15),
-                // Badge de Rol
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: colorAcento.withOpacity(0.1),
+                    color: colorMarca.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: colorAcento.withOpacity(0.5)),
+                    border: Border.all(color: colorAcento.withOpacity(0.4)),
                   ),
                   child: Text(
                     role.toUpperCase(),
@@ -128,29 +133,40 @@ class ProfilePage extends StatelessWidget {
                       color: colorAcento,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
                 const SizedBox(height: 40),
 
-                // OPCIONES DE PERFIL (Encapsuladas en una tarjeta)
                 Container(
                   decoration: BoxDecoration(
                     color: colorTarjeta,
                     borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
                   child: Column(
                     children: [
                       _buildProfileOption(
                         Icons.star_outline_rounded,
                         'Mis calificaciones',
-                        () {},
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyCommentsScreen(),
+                          ),
+                        ),
                       ),
                       const Divider(color: Colors.white10, height: 1),
                       _buildProfileOption(
                         Icons.bookmark_border_rounded,
                         'Mis reservas',
-                        () {},
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyServicesScreen(),
+                          ),
+                        ),
                       ),
                       const Divider(color: Colors.white10, height: 1),
                       _buildProfileOption(
@@ -163,15 +179,24 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const Divider(color: Colors.white10, height: 1),
+                      _buildProfileOption(
+                        Icons.analytics_outlined,
+                        'Panel de Estadísticas',
+                        () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const StadsPanel()),
+                        ),
+                      ),
                       if (role == 'admin') ...[
                         const Divider(color: Colors.white10, height: 1),
                         _buildProfileOption(
-                          Icons.analytics_outlined,
-                          'Panel de Estadísticas',
+                          Icons.admin_panel_settings_outlined,
+                          'Panel de Admin',
                           () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const AdminPanelScreen(),
+                              builder: (_) => const AdminPanelPage(),
                             ),
                           ),
                         ),
@@ -182,14 +207,13 @@ class ProfilePage extends StatelessWidget {
 
                 const SizedBox(height: 50),
 
-                // BOTÓN CERRAR SESIÓN
                 TextButton.icon(
                   onPressed: () async {
                     await supabase.auth.signOut();
                     if (context.mounted) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        MaterialPageRoute(builder: (_) => const intial()),
                       );
                     }
                   },
@@ -210,6 +234,7 @@ class ProfilePage extends StatelessWidget {
                       horizontal: 30,
                       vertical: 15,
                     ),
+                    backgroundColor: Colors.redAccent.withOpacity(0.1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -238,7 +263,7 @@ class ProfilePage extends StatelessWidget {
       trailing: const Icon(
         Icons.arrow_forward_ios_rounded,
         color: Colors.white24,
-        size: 16,
+        size: 14,
       ),
       onTap: onTap,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

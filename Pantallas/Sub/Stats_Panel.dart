@@ -1,10 +1,9 @@
 import 'package:evv/Componentes/General/Datos.dart';
 import 'package:flutter/material.dart';
 
-class AdminPanelScreen extends StatelessWidget {
-  const AdminPanelScreen({super.key});
+class StadsPanel extends StatelessWidget {
+  const StadsPanel({super.key});
 
-  // --- PALETA CORAL REEF ---
   final colorFondo = const Color(0xFFF8FAFC); // Perla
   final colorCoral = const Color(0xFFFF6B6B); // Coral
   final colorCerceta = const Color(0xFF0D9488); // Cerceta
@@ -46,7 +45,6 @@ class AdminPanelScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // FILA DE TARJETAS DE ESTADÍSTICAS
             Row(
               children: [
                 _statCard(
@@ -66,8 +64,6 @@ class AdminPanelScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 35),
-
-            // SECCIÓN DE SERVICIOS TOP
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -88,7 +84,6 @@ class AdminPanelScreen extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // SECCIÓN DE REPORTES
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(

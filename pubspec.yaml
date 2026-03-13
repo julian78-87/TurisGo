@@ -40,6 +40,10 @@ dependencies:
   flutter_map: ^7.0.2
   easy_localization: ^3.0.7
   latlong2: ^0.9.1
+  google_maps_flutter: ^2.5.3
+  provider: ^6.1.2
+  table_calendar: ^3.0.9
+
 
 dev_dependencies:
   flutter_test:

@@ -13,11 +13,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLogin = true;
   bool isLoading = false;
 
-  // --- PALETA TURISGO (No tocar lógica) ---
-  final Color colorAbismo = const Color(0xFF0F172A);
-  final Color colorCerceta = const Color(0xFF0D9488);
-  final Color colorCoral = const Color(0xFFFF6B6B);
-  final Color colorTexto = const Color(0xFF1E293B);
+  final Color colorFondo = const Color(0xFF1A1A1A);
+  final Color colorPrimario = Colors.orangeAccent;
+  final Color colorAppBar = const Color(0xFF5F1E06);
+  final Color colorTextoClaro = Colors.white;
+  final Color colorTextoOscuro = const Color(0xFF2D2D2D);
 
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: colorCoral, // Ajuste a color de la paleta
+        backgroundColor: colorAppBar,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -94,29 +94,37 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2D2D2D),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Recuperar contraseña'),
+        title: Text(
+          'Recuperar contraseña',
+          style: TextStyle(color: colorPrimario),
+        ),
         content: TextField(
           controller: recoverController,
+          style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            labelText: 'Ingresa tu correo electrónico',
+            labelText: 'Correo electrónico',
+            labelStyle: const TextStyle(color: Colors.white70),
             hintText: 'ejemplo@correo.com',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            hintStyle: const TextStyle(color: Colors.white30),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: colorPrimario),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'Cancelar',
-              style: TextStyle(color: colorTexto.withOpacity(0.5)),
+              style: TextStyle(color: Colors.white54),
             ),
           ),
           ElevatedButton(
             onPressed: () async {
               final email = recoverController.text.trim();
               if (email.isEmpty) return;
-
               try {
                 await supabase.auth.resetPasswordForEmail(email);
                 if (mounted) {
@@ -127,7 +135,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 _showMsg("Error al enviar el correo");
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: colorCerceta),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorPrimario,
+              foregroundColor: Colors.black,
+            ),
             child: const Text('Enviar'),
           ),
         ],
@@ -138,10 +149,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: colorFondo,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [colorAbismo, colorCerceta],
+            colors: [colorAppBar, colorFondo],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -150,30 +162,27 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Card(
-              elevation: 0,
-              color: Colors.white.withOpacity(0.95),
+              elevation: 10,
+              color: Colors.white.withOpacity(0.05),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
+                side: BorderSide(color: Colors.white10),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.explore_rounded, // Cambio a un icono más "viajero"
-                      size: 80,
-                      color: colorCerceta,
-                    ),
+                    Icon(Icons.travel_explore, size: 70, color: colorPrimario),
                     const SizedBox(height: 20),
                     Text(
-                      isLogin ? 'BIENVENIDO A TurisGo' : 'CREA TU CUENTA',
+                      isLogin ? 'BIENVENIDO A TURIS-GO' : 'CREA TU CUENTA',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: colorTexto,
-                        letterSpacing: 1.2,
+                        color: colorTextoClaro,
+                        letterSpacing: 1.5,
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -198,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: Icons.lock_outline,
                       isPass: true,
                     ),
-                    const SizedBox(height: 8),
                     if (isLogin)
                       Align(
                         alignment: Alignment.centerRight,
@@ -207,8 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             '¿Olvidaste tu contraseña?',
                             style: TextStyle(
-                              color: colorCerceta,
-                              fontWeight: FontWeight.w600,
+                              color: colorPrimario,
                               fontSize: 12,
                             ),
                           ),
@@ -216,25 +223,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     const SizedBox(height: 30),
                     isLoading
-                        ? CircularProgressIndicator(color: colorCerceta)
+                        ? CircularProgressIndicator(color: colorPrimario)
                         : ElevatedButton(
                             onPressed: _authenticate,
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: colorPrimario,
+                              foregroundColor: Colors.black,
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
-                              backgroundColor: colorCoral,
-                              foregroundColor: Colors.white,
-                              elevation: 4,
                             ),
                             child: Text(
                               isLogin ? 'INGRESAR' : 'REGISTRARSE',
                               style: const TextStyle(
-                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 1.1,
                               ),
                             ),
                           ),
@@ -252,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isLogin
                             ? '¿No tienes cuenta? Regístrate'
                             : '¿Ya tienes cuenta? Inicia sesión',
-                        style: TextStyle(color: colorTexto.withOpacity(0.6)),
+                        style: const TextStyle(color: Colors.white70),
                       ),
                     ),
                   ],
@@ -276,14 +279,20 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       obscureText: isPass,
       keyboardType: keyboard,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: colorCerceta),
+        labelStyle: const TextStyle(color: Colors.white60),
+        prefixIcon: Icon(icon, color: colorPrimario),
         filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
+        fillColor: Colors.white.withOpacity(0.08),
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: Colors.white10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: colorPrimario),
         ),
       ),
     );
