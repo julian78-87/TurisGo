@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:evv/Componentes/AddService/verify_address_button.dart';
 import 'package:evv/Componentes/AddService/image_picker_section.dart';
 import 'package:evv/Componentes/AddService/service_form_fields.dart';
@@ -8,7 +8,9 @@ import 'package:evv/Componentes/AddService/save_button.dart';
 import 'package:evv/Componentes/AddService/app_constants.dart';
 
 class AddServiceScreen extends StatefulWidget {
-  const AddServiceScreen({super.key});
+  const AddServiceScreen({super.key, this.serviceToEdit});
+
+  final Map<String, dynamic>? serviceToEdit;
 
   @override
   State<AddServiceScreen> createState() => _AddServiceScreenState();
@@ -17,11 +19,10 @@ class AddServiceScreen extends StatefulWidget {
 class _AddServiceScreenState extends State<AddServiceScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // --- PALETA CORAL REEF ---
-  final colorFondo = const Color(0xFFF8FAFC); // Perla
-  final colorCoral = const Color(0xFFFF6B6B); // Coral
-  final colorCerceta = const Color(0xFF0D9488); // Cerceta
-  final colorTexto = const Color(0xFF1E293B); // Azul Abismo
+  final colorFondo = const Color(0xFFF8FAFC);
+  final colorCoral = const Color(0xFFFF6B6B);
+  final colorCerceta = const Color(0xFF0D9488);
+  final colorTexto = const Color(0xFF1E293B);
 
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
@@ -32,12 +33,23 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   String _categoria = 'Casa';
   bool _isVerified = false;
-  File? _image;
+  XFile? _image; // <-- CAMBIADO DE File? A XFile?
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.serviceToEdit != null) {
+      final s = widget.serviceToEdit!;
+      _nameController.text = s['name'] ?? '';
+      _descController.text = s['description'] ?? '';
+      _addrController.text = s['address'] ?? '';
+      _transController.text = s['transport'] ?? '';
+      _priceController.text = s['price'].toString();
+      _categoria = s['category'] ?? 'Casa';
+      _isVerified = true;
+    }
+
     _addrController.addListener(() {
       if (_isVerified) setState(() => _isVerified = false);
     });
@@ -77,36 +89,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           children: [
-            // SECCIÓN DE IMAGEN CON ESTILO
-            Text(
+            const Text(
               "Foto de portada",
               style: TextStyle(
-                color: colorTexto,
+                color: Color(0xFF1E293B),
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
             ),
             const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorTexto.withOpacity(0.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ImagePickerSection(
-                image: _image,
-                onImagePicked: (file) => setState(() => _image = file),
-              ),
+            ImagePickerSection(
+              image: _image,
+              onImagePicked: (file) => setState(() => _image = file),
             ),
-
             const SizedBox(height: 32),
-
-            // FORMULARIO ENVOLVÉNDOLO EN UNA "TARJETA" LIMPIA
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -115,7 +111,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 border: Border.all(color: colorTexto.withOpacity(0.03)),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ServiceFormFields(
                     nameController: _nameController,
@@ -127,22 +122,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     onCategoryChanged: (val) =>
                         setState(() => _categoria = val),
                   ),
-
                   if (_categoria == 'Otro') ...[
                     const SizedBox(height: 15),
                     TextFormField(
                       controller: _customCatController,
                       decoration: InputDecoration(
                         labelText: '¿Qué tipo de servicio es?',
-                        labelStyle: TextStyle(
-                          color: colorTexto.withOpacity(0.5),
-                        ),
-                        filled: true,
-                        fillColor: colorFondo,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
                         prefixIcon: Icon(Icons.edit_note, color: colorCoral),
                       ),
                       validator: (v) => _categoria == 'Otro' && v!.isEmpty
@@ -150,26 +135,19 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           : null,
                     ),
                   ],
-
                   const SizedBox(height: 20),
-
                   if (AppConstants.alojCats.contains(_categoria))
                     VerifyAddressButton(
                       addressController: _addrController,
                       isVerified: _isVerified,
                       onVerify: () => setState(() => _isVerified = true),
                     ),
-
                   const Divider(height: 40, thickness: 1),
-
                   TransportField(visible: true, controller: _transController),
                 ],
               ),
             ),
-
             const SizedBox(height: 40),
-
-            // BOTÓN DE GUARDAR CORAL
             SaveButton(
               formKey: _formKey,
               isVerified: _isVerified,
@@ -182,19 +160,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               address: _addrController.text,
               transport: _transController.text,
               priceText: _priceController.text,
-              image: _image,
+              image:
+                  _image, // Aquí ya no debería haber error si SaveButton usa XFile?
               onLoadingChange: (val) => setState(() => _isLoading = val),
               onSuccess: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('¡Servicio publicado con éxito!'),
-                    backgroundColor: colorCerceta,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
                 Navigator.pop(context);
               },
               context: context,

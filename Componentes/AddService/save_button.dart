@@ -1,7 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:evv/Componentes/General/Datos.dart'; // Importante para acceder a AppData.currentUser
 
 class SaveButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -13,7 +12,7 @@ class SaveButton extends StatelessWidget {
   final String address;
   final String transport;
   final String priceText;
-  final File? image;
+  final XFile? image;
   final Function(bool) onLoadingChange;
   final VoidCallback onSuccess;
   final BuildContext context;
@@ -35,13 +34,9 @@ class SaveButton extends StatelessWidget {
     required this.context,
   });
 
-  Future<void> _handleSave() async {
-    // 1. Validaciones previas
+  Future<void> _saveService() async {
     if (!formKey.currentState!.validate()) return;
-
-    // Si la categoría requiere verificación y no está verificado
-    final alojCats = ['Casa', 'Hotel', 'Hostal', 'Apartamento'];
-    if (alojCats.contains(category) && !isVerified) {
+    if (!isVerified) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, verifica la dirección primero'),
@@ -49,23 +44,34 @@ class SaveButton extends StatelessWidget {
       );
       return;
     }
+    if (image == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, selecciona una imagen')),
+      );
+      return;
+    }
 
     onLoadingChange(true);
-    final supabase = Supabase.instance.client;
 
     try {
-      String? imageUrl;
+      final supabase = Supabase.instance.client;
 
-      // 2. Subida de imagen al bucket 'services'
-      if (image != null) {
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-        final path = 'public/$fileName';
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-        await supabase.storage.from('services').upload(path, image!);
-        imageUrl = supabase.storage.from('services').getPublicUrl(path);
-      }
+      final imageBytes = await image!.readAsBytes();
 
-      // 3. Inserción en la tabla 'services'
+      await supabase.storage
+          .from('services-images')
+          .uploadBinary(
+            fileName,
+            imageBytes,
+            fileOptions: const FileOptions(contentType: 'image/jpeg'),
+          );
+
+      final imageUrl = supabase.storage
+          .from('services-images')
+          .getPublicUrl(fileName);
+
       await supabase.from('services').insert({
         'name': name,
         'description': description,
@@ -73,22 +79,17 @@ class SaveButton extends StatelessWidget {
         'address': address,
         'transport': transport,
         'price': double.tryParse(priceText) ?? 0.0,
-        'verified': isVerified,
         'image_url': imageUrl,
-        // Sacamos el proveedor directamente de tus datos globales
-        'proveedor': AppData.currentUser['nombre'],
       });
 
       onSuccess();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('¡Servicio guardado exitosamente!')),
+      );
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al guardar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al guardar: $e')));
     } finally {
       onLoadingChange(false);
     }
@@ -96,22 +97,18 @@ class SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ElevatedButton(
-            onPressed: _handleSave,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+    return ElevatedButton(
+      onPressed: isLoading ? null : _saveService,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.teal,
+        minimumSize: const Size(double.infinity, 50),
+      ),
+      child: isLoading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Text(
+              'GUARDAR SERVICIO',
+              style: TextStyle(color: Colors.white),
             ),
-            child: const Text(
-              'PUBLICAR SERVICIO',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          );
+    );
   }
 }

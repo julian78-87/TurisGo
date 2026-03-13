@@ -1,4 +1,4 @@
-import 'package:evv/Pantallas/Principal/Login_Register.dart';
+import 'package:evv/Pantallas/Principal/initial.dart';
 import 'package:flutter/material.dart';
 
 class ExploraTurismoApp extends StatelessWidget {
@@ -17,12 +17,11 @@ class ExploraTurismoApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
-      home: const LoginScreen(),
+      home: const intial(),
     );
   }
 }
 
-// ====================== MODELOS ======================
 class TouristService {
   final String id;
   final String nombre;
@@ -30,7 +29,7 @@ class TouristService {
   final String descripcion;
   final double precio;
   final String imagen;
-  final String categoria; // Playa, Montaña, Ciudad, Cultura, Aventura
+  final String categoria;
   double rating;
   int reviews;
   final String proveedor;
@@ -56,7 +55,7 @@ class Reservation {
   final DateTime fechaFin;
   final int personas;
   final double total;
-  final String estado; // Confirmada, Pendiente, Cancelada
+  final String estado;
 
   Reservation({
     required this.id,
@@ -99,34 +98,4 @@ class NotificationItem {
     required this.time,
     this.read = false,
   });
-}
-
-// ====================== PANTALLAS ======================z
-
-// MAPA INTERACTIVO
-class InteractiveMapScreen extends StatelessWidget {
-  const InteractiveMapScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mapa Interactivo')),
-      body: InteractiveViewer(
-        boundaryMargin: const EdgeInsets.all(20),
-        minScale: 0.5,
-        maxScale: 4,
-        child: Image.network(
-          'https://picsum.photos/id/1015/1200/800', // imagen simulada de mapa de Colombia
-          fit: BoxFit.contain,
-        ),
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(16),
-        child: const Text(
-          'Pincha y arrastra para moverte • Zoom con dos dedos\nDestinos activos: San Andrés, Cartagena, Salento, Manizales',
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
 }

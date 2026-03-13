@@ -14,7 +14,6 @@ class _RatingPageState extends State<RatingPage> {
   int selectedStars = 0;
   final TextEditingController commentController = TextEditingController();
 
-  // --- PALETA CORAL REEF ---
   final colorFondo = const Color(0xFFF8FAFC);
   final colorCoral = const Color(0xFFFF6B6B);
   final colorCerceta = const Color(0xFF0D9488);
@@ -72,7 +71,6 @@ class _RatingPageState extends State<RatingPage> {
       ),
       body: CustomScrollView(
         slivers: [
-          // CABECERA - PROMEDIO
           SliverToBoxAdapter(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: supabase
@@ -137,7 +135,6 @@ class _RatingPageState extends State<RatingPage> {
             ),
           ),
 
-          // SECCIÓN PARA CALIFICAR
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -205,15 +202,15 @@ class _RatingPageState extends State<RatingPage> {
             ),
           ),
 
-          // LISTA DE COMENTARIOS
           StreamBuilder<List<Map<String, dynamic>>>(
             stream: supabase
                 .from('ratings')
                 .stream(primaryKey: ['id'])
                 .eq('service_id', widget.serviceId),
             builder: (context, snapshot) {
-              if (!snapshot.hasData)
+              if (!snapshot.hasData) {
                 return const SliverToBoxAdapter(child: SizedBox());
+              }
               final ratings = snapshot.data!;
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {

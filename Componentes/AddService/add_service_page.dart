@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'image_picker_section.dart';
 import 'service_form_fields.dart';
 import 'verify_address_button.dart';
@@ -26,7 +26,7 @@ class _AddServicePageState extends State<AddServicePage> {
 
   String _cat = 'Casa';
   bool _verif = false;
-  File? _image;
+  XFile? _image; // Cambiado de File? a XFile?
   bool _loading = false;
 
   final cats = [
@@ -38,7 +38,8 @@ class _AddServicePageState extends State<AddServicePage> {
     'Otro',
   ];
 
-  void _updateImage(File? newImage) {
+  // Actualizado para recibir XFile
+  void _updateImage(XFile? newImage) {
     setState(() => _image = newImage);
   }
 
@@ -64,6 +65,7 @@ class _AddServicePageState extends State<AddServicePage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // El componente ImagePickerSection que corregimos antes ya acepta XFile
             ImagePickerSection(image: _image, onImagePicked: _updateImage),
             const SizedBox(height: 20),
             ServiceFormFields(
@@ -89,8 +91,10 @@ class _AddServicePageState extends State<AddServicePage> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _price,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Precio',
+                prefixText: '\$ ',
                 border: OutlineInputBorder(),
               ),
               validator: (v) => v!.isEmpty ? 'Requerido' : null,
@@ -100,13 +104,14 @@ class _AddServicePageState extends State<AddServicePage> {
               formKey: _formKey,
               isVerified: _verif,
               isLoading: _loading,
+              // Pasamos los valores actuales de los controladores
               name: _name.text,
               description: _desc.text,
               category: _cat,
               address: _addr.text,
               transport: _trans.text,
               priceText: _price.text,
-              image: _image,
+              image: _image, // Ahora es XFile
               onLoadingChange: _setLoading,
               onSuccess: () {
                 _name.clear();

@@ -15,3 +15,6 @@ Future<void> main() async {
 }
 
 final supabase = Supabase.instance.client;
+
+const supabaseUrl = 'https://boxmnuhfjbkdcppkhmyk.supabase.co';
+const supabaseAnonKey = 'sb_publishable_AI0DBkhz4uYF6W2AoDTIgQ_H1TdqilX';

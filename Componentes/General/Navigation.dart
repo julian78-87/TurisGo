@@ -17,7 +17,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final colorCoral = const Color(0xFFFF6B6B);
+  final Color colorFondo = const Color(0xFF1A1A1A);
+  final Color colorAcento = Colors.orangeAccent;
+  final Color colorMarca = const Color(0xFF5F1E06);
 
   final List<Widget> _pages = [
     const HomePage(),
@@ -30,21 +32,62 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: colorFondo,
       body: _pages[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        indicatorColor: colorCoral.withOpacity(0.5),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Inicio'),
-          NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
-          NavigationDestination(
-            icon: Icon(Icons.card_travel),
-            label: 'Reservas',
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          indicatorColor: colorAcento.withOpacity(0.2),
+          labelTextStyle: WidgetStateProperty.all(
+            const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.white70,
+            ),
           ),
-          NavigationDestination(icon: Icon(Icons.chat), label: 'Mensajes'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+        ),
+        child: NavigationBar(
+          height: 70,
+          backgroundColor: const Color(0xFF252525),
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (index) =>
+              setState(() => _currentIndex = index),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined, color: Colors.white54),
+              selectedIcon: Icon(Icons.home, color: colorAcento),
+              label: 'Inicio',
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.search_rounded, color: Colors.white54),
+              selectedIcon: Icon(Icons.search_rounded, color: colorAcento),
+              label: 'Buscar',
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.card_travel_outlined,
+                color: Colors.white54,
+              ),
+              selectedIcon: Icon(Icons.card_travel, color: colorAcento),
+              label: 'Viajes',
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                color: Colors.white54,
+              ),
+              selectedIcon: Icon(Icons.chat_bubble_rounded, color: colorAcento),
+              label: 'Chats',
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.person_outline_rounded,
+                color: Colors.white54,
+              ),
+              selectedIcon: Icon(Icons.person, color: colorAcento),
+              label: 'Perfil',
+            ),
+          ],
+        ),
       ),
       floatingActionButton:
           AppData.currentUser['isProveedor'] == true ||
@@ -54,8 +97,9 @@ class _MainScreenState extends State<MainScreen> {
                 context,
                 MaterialPageRoute(builder: (_) => const AddServiceScreen()),
               ),
-              backgroundColor: colorCoral.withOpacity(0.7),
-              child: const Icon(Icons.add),
+              backgroundColor: colorAcento,
+              elevation: 8,
+              child: Icon(Icons.add, color: colorMarca, size: 30),
             )
           : null,
     );
